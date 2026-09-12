@@ -1,7 +1,11 @@
+import binascii
+import os
+from datetime import timedelta
 from uuid import uuid4
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils import timezone
 
 
 class BaseModel(models.Model):
@@ -26,11 +30,67 @@ class DogUserModel(AbstractUser, BaseModel):
         return self.username
 
 
+class AuthTokenModel(BaseModel):
+    """Represents an authentication token for a user"""
+
+    TOKEN_TYPE_ACCESS = "access"
+    TOKEN_TYPE_REFRESH = "refresh"
+    TOKEN_TYPE_CHOICES = (
+        (TOKEN_TYPE_ACCESS, "Access"),
+        (TOKEN_TYPE_REFRESH, "Refresh"),
+    )
+
+    key = models.CharField(max_length=40, unique=True)
+    user = models.ForeignKey(
+        to=DogUserModel, related_name="auth_tokens", on_delete=models.CASCADE
+    )
+    created = models.DateTimeField(auto_now_add=True)
+    expires = models.DateTimeField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    token_type = models.CharField(
+        max_length=7,
+        choices=TOKEN_TYPE_CHOICES,
+        default=TOKEN_TYPE_ACCESS,
+    )
+
+    class Meta:
+        verbose_name = "Auth Token"
+        verbose_name_plural = "Auth Tokens"
+        unique_together = ("user", "token_type")
+
+    def save(self, *args, **kwargs):
+        if not self.key:
+            self.key = self.generate_key()
+        if self.expires is None:
+            lifetime = (
+                timedelta(days=7)
+                if self.token_type == self.TOKEN_TYPE_REFRESH
+                else timedelta(hours=4)
+            )
+            self.expires = timezone.now() + lifetime
+        return super().save(*args, **kwargs)
+
+    def generate_key(self):
+        return binascii.hexlify(os.urandom(20)).decode()
+
+    def is_expired(self):
+        if self.expires is None:
+            return False
+        return timezone.now() >= self.expires
+
+    def is_valid(self):
+        return self.is_active and not self.is_expired()
+
+    def __str__(self):
+        return f"Token {self.key[:6]}... for {self.user.username}"
+
+
 class BarkModel(BaseModel):
     """A short message posted by a dog user."""
 
     message = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(
         DogUserModel,
         on_delete=models.CASCADE,
