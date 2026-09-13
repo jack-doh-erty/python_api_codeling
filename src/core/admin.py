@@ -14,4 +14,4 @@ class BarkAdmin(admin.ModelAdmin):
 
 @admin.register(AuthTokenModel)
 class AuthTokenAdmin(admin.ModelAdmin):
-    readonly_fields = ("key", "created")
+    readonly_fields = ("key", "created_at")

@@ -2,31 +2,35 @@ from uuid import UUID
 
 from ninja import Router
 
+from api.logic.bark_logic import (
+    handle_barks_list,
+    handle_create_bark,
+    handle_delete_bark,
+    handle_get_bark,
+    handle_update_bark,
+)
 from api.schemas.bark_schemas import (
     BarkCreateUpdateSchemaIn,
     BarkSchemaOut,
 )
+from api.logic.exceptions import get_error_response
 from api.schemas.common_schemas import ErrorSchemaOut
 from core.models import BarkModel, DogUserModel
 
 router = Router()
-
 
 @router.get("/", response=list[BarkSchemaOut], auth=None)
 def barks_list(request):
     """
     Bark list endpoint that returns a list of barks.
     """
-    return BarkModel.objects.select_related("user").all()
+    return handle_barks_list()
 
 
 @router.post("/", response={201: BarkSchemaOut})
 def create_bark(request, bark: BarkCreateUpdateSchemaIn):
     """Create a new bark."""
-    data = bark.dict()
-    data["user_id"] = request.auth.id
-    obj = BarkModel.objects.create(**data)
-    return 201, obj
+    return handle_create_bark(request.auth, bark.model_dump())
 
 @router.get("/{bark_id}/", response={200: BarkSchemaOut, 404: ErrorSchemaOut}, auth=None)
 def get_bark(request, bark_id: UUID):
@@ -34,30 +38,24 @@ def get_bark(request, bark_id: UUID):
     Bark detail endpoint that returns a single bark.
     """
     try:
-        return BarkModel.objects.select_related("user").get(id=bark_id)
-    except BarkModel.DoesNotExist:
-        return 404, {"error": "Bark not found"}
+        return handle_get_bark(bark_id)
+    except Exception as exc:
+        return get_error_response(exc)
 
 @router.put("/{bark_id}/", response={200: BarkSchemaOut, 404: ErrorSchemaOut})
 def update_bark(request, bark_id: UUID, bark: BarkCreateUpdateSchemaIn):
     """Update an existing bark."""
     try:
-        obj = BarkModel.objects.filter(user_id=request.auth.id).select_related("user").get(id=bark_id)
-    except BarkModel.DoesNotExist:
-        return 404, {"error": "Bark not found"}
-
-    for field, value in bark.dict().items():
-        setattr(obj, field, value)
-    obj.save()
-    return 200, obj
+        return handle_update_bark(bark_id, request.auth, bark.model_dump())
+    except Exception as exc:
+        return get_error_response(exc)
 
 @router.delete("/{bark_id}/", response={204: None, 404: ErrorSchemaOut})
 def delete_bark(request, bark_id: UUID):
     """Delete an existing bark."""
-    try:
-        obj = BarkModel.objects.filter(user_id=request.auth.id).get(id=bark_id)
-    except BarkModel.DoesNotExist:
-        return 404, {"error": "Bark not found"}
 
-    obj.delete()
-    return 204, None
+    try:
+        handle_delete_bark(bark_id, request.auth)
+        return 204, None
+    except Exception as exc:
+        return get_error_response(exc)
