@@ -16,14 +16,24 @@ from api.logic.user_logic import (
     handle_update_me,
 )
 from api.logic.exceptions import get_error_response
+from common.pagination import TimestampCursorPagination
+from ninja.pagination import paginate
 
 router = Router()
 
 
 @router.get("/", response=list[DogUserSchemaOut])
-def dog_users_list(request):
+@paginate(TimestampCursorPagination)
+def dog_users_list(
+    request,
+    favorite_toy: str | None = None,
+    username: str | None = None,
+):
     """Return a list of dog users."""
-    users = handle_dog_users_list()
+    users = handle_dog_users_list(
+        favorite_toy=favorite_toy,
+        username=username,
+    )
     return users
 
 

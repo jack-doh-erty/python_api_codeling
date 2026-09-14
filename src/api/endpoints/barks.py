@@ -15,11 +15,14 @@ from api.schemas.bark_schemas import (
 )
 from api.logic.exceptions import get_error_response
 from api.schemas.common_schemas import ErrorSchemaOut
+from common.pagination import SkipPagination
 from core.models import BarkModel, DogUserModel
+from ninja.pagination import paginate
 
 router = Router()
 
 @router.get("/", response=list[BarkSchemaOut], auth=None)
+@paginate
 def barks_list(request):
     """
     Bark list endpoint that returns a list of barks.

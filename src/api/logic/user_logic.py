@@ -2,12 +2,17 @@ from core.models import AuthTokenModel, DogUserModel
 from api.logic.exceptions import DuplicateResourceError, ResourceNotFoundError
 
 
-def handle_dog_users_list():
+def handle_dog_users_list(favorite_toy=None, username=None):
     """
     Handle the logic for listing dog users.
     Returns a list of all dog users.
     """
-    return DogUserModel.objects.all()
+    users = DogUserModel.objects.all()
+    if favorite_toy:
+        users = users.filter(favorite_toy__icontains=favorite_toy)
+    if username:
+        users = users.filter(username__icontains=username)
+    return users
 
 
 def handle_get_dog_user(user_id: int) -> DogUserModel:

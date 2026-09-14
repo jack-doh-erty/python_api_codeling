@@ -1,6 +1,9 @@
 # REST API Design with Python
 
-This is the student starter repo for the [REST API Design with Python](https://codeling.dev/courses/rest-api-design/) course provided by [Codeling](https://codeling.dev).
+This is my project for completing Codeling's REST API Design with Python
+course, with help from Codex.
+
+[Open this course workspace in Codeling](https://app.codeling.dev/workspace/863f2d9f-8af5-489a-be84-840a7d031aaf).
 
 ## How to use this repo
 
@@ -14,10 +17,24 @@ Follow these steps:
 2. Give the repository a name (eg: codeling-rest-api)
 3. Click the _Create Repository_ button
 4. Clone your repo onto your local computer
-5. Start the course here: [https://app.codeling.dev](https://app.codeling.dev)
+5. Start the course in the [Codeling workspace](https://app.codeling.dev/workspace/863f2d9f-8af5-489a-be84-840a7d031aaf)
 
 Your course progress will sync to your Codeling account seamlessly.
 
 ## More info
 
 Detailed instructions are provided in the [course](https://app.codeling.dev) and you're always welcome to [contact us](https://codeling.dev/contact/) if you have any questions.
+
+## Seed data for pagination testing
+
+After applying migrations, create 20 test users and 10,000 barks with:
+
+```shell
+cd src
+uv run python manage.py seed_db
+```
+
+The command accepts `--users`, `--barks`, `--batch-size`, and `--password` options.
+Seed usernames start at `seed_dog_001`; their default password is
+`seed-password`. Existing seed users are reused, while each run adds the
+requested number of new barks.
