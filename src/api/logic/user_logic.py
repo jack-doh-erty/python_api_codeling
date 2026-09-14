@@ -1,18 +1,16 @@
+from django.db.models import QuerySet
+
+from common.filters import UsersFilter, apply_ordering
 from core.models import AuthTokenModel, DogUserModel
 from api.logic.exceptions import DuplicateResourceError, ResourceNotFoundError
 
 
-def handle_dog_users_list(favorite_toy=None, username=None):
+def handle_dog_users_list(filters: UsersFilter) -> QuerySet[DogUserModel]:
     """
     Handle the logic for listing dog users.
-    Returns a list of all dog users.
     """
-    users = DogUserModel.objects.all()
-    if favorite_toy:
-        users = users.filter(favorite_toy__icontains=favorite_toy)
-    if username:
-        users = users.filter(username__icontains=username)
-    return users
+    objs = DogUserModel.objects.all()
+    return apply_ordering(filters.filter(objs), filters.order_by)
 
 
 def handle_get_dog_user(user_id: int) -> DogUserModel:

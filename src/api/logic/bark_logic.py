@@ -1,12 +1,19 @@
+from django.db.models import QuerySet
+
+from common.filters import BarksFilter, apply_ordering
 from core.models import BarkModel, DogUserModel
 from api.logic.exceptions import DuplicateResourceError, ResourceNotFoundError
 
 
-def handle_barks_list(favorite_toy=None):
+def handle_barks_list(filters: BarksFilter) -> QuerySet[BarkModel]:
     """Return all barks with their users loaded."""
-    if favorite_toy:
-        return BarkModel.objects.select_related("user").filter(favorite_toy=favorite_toy).all()
-    return BarkModel.objects.select_related("user").all()
+    objs = BarkModel.objects.select_related("user").all()
+    results = filters.filter(objs)
+
+    if filters.trending:
+        return results.order_by("-sniff_count")
+
+    return apply_ordering(results, filters.order_by)
 
 
 def handle_create_bark(user: DogUserModel, data: dict) -> BarkModel:

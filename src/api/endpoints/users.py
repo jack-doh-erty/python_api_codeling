@@ -1,4 +1,4 @@
-from ninja import Router
+from ninja import Query, Router
 from uuid import UUID
 
 from api.schemas.common_schemas import ErrorSchemaOut
@@ -16,24 +16,19 @@ from api.logic.user_logic import (
     handle_update_me,
 )
 from api.logic.exceptions import get_error_response
-from common.pagination import TimestampCursorPagination
+from common.filters import UsersFilter
 from ninja.pagination import paginate
 
 router = Router()
 
 
 @router.get("/", response=list[DogUserSchemaOut])
-@paginate(TimestampCursorPagination)
-def dog_users_list(
-    request,
-    favorite_toy: str | None = None,
-    username: str | None = None,
-):
-    """Return a list of dog users."""
-    users = handle_dog_users_list(
-        favorite_toy=favorite_toy,
-        username=username,
-    )
+@paginate
+def dog_users_list(request, filters: UsersFilter = Query(...)):
+    """
+    Endpoint that returns a list of dog users.
+    """
+    users = handle_dog_users_list(filters=filters)
     return users
 
 

@@ -95,6 +95,7 @@ class BarkModel(BaseModel):
         on_delete=models.CASCADE,
         related_name="barks",
     )
+    sniff_count = models.PositiveIntegerField(default=0)
 
     class Meta:
         verbose_name = "Bark"
@@ -102,3 +103,21 @@ class BarkModel(BaseModel):
 
     def __str__(self):
         return f"{self.user.username} - {self.message[:20]}..."
+
+
+class UserSniffModel(BaseModel):
+    """Records that a user has sniffed a bark."""
+
+    user = models.ForeignKey(
+        DogUserModel,
+        on_delete=models.CASCADE,
+        related_name="sniffs",
+    )
+    bark = models.ForeignKey(
+        BarkModel,
+        on_delete=models.CASCADE,
+        related_name="user_sniffs",
+    )
+
+    class Meta:
+        unique_together = ("user", "bark")
