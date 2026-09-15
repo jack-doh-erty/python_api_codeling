@@ -1,6 +1,6 @@
 from ninja import ModelSchema, Schema
 
-from api.schemas.user_schemas import DogUserSchemaOut
+from api_v2.schemas.user_schemas import DogUserSchemaOut
 from core.models import BarkModel
 from pydantic import field_validator
 

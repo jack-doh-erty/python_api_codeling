@@ -23,6 +23,11 @@ class DogUserModel(AbstractUser, BaseModel):
     """Custom user model for dog users."""
 
     favorite_toy = models.CharField(max_length=100, blank=True)
+    profile_image = models.ImageField(
+        upload_to="profile_images/",
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         verbose_name = "Dog User"

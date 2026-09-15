@@ -2,14 +2,14 @@ from ninja import File, Query, Router
 from ninja.files import UploadedFile
 from uuid import UUID
 
-from api.schemas.common_schemas import ErrorSchemaOut
-from api.schemas.user_schemas import (
+from api_v2.schemas.common_schemas import ErrorSchemaOut
+from api_v2.schemas.user_schemas import (
     DogUserCreateSchemaIn,
     DogUserSchemaOut,
     DogUserUpdateSchemaIn,
     DogUserWithTokenSchemaOut,
 )
-from api.logic.user_logic import (
+from api_v2.logic.user_logic import (
     handle_create_dog_user,
     handle_dog_users_list,
     handle_get_current_user,
@@ -17,7 +17,7 @@ from api.logic.user_logic import (
     handle_upload_profile_image,
     handle_update_me,
 )
-from api.logic.exceptions import get_error_response
+from api_v2.logic.exceptions import get_error_response
 from common.filters import UsersFilter
 from ninja.pagination import paginate
 

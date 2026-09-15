@@ -4,7 +4,7 @@ from ninja.files import UploadedFile
 
 from common.filters import UsersFilter, apply_ordering
 from core.models import AuthTokenModel, DogUserModel
-from api.logic.exceptions import (
+from api_v2.logic.exceptions import (
     DuplicateResourceError,
     InvalidFileError,
     ResourceNotFoundError,

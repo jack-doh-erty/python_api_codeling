@@ -6,7 +6,7 @@ from django.http import HttpResponse
 
 from common.filters import BarksFilter, apply_ordering
 from core.models import BarkModel, DogUserModel
-from api.logic.exceptions import DuplicateResourceError, ResourceNotFoundError
+from api_v2.logic.exceptions import DuplicateResourceError, ResourceNotFoundError
 
 
 def handle_export_top_barks_csv(user: DogUserModel) -> HttpResponse:

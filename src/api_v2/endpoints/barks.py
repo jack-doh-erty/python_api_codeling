@@ -1,7 +1,7 @@
 from uuid import UUID
 from ninja import Query, Router
 
-from api.logic.bark_logic import (
+from api_v2.logic.bark_logic import (
     handle_barks_list,
     handle_create_bark,
     handle_delete_bark,
@@ -9,12 +9,12 @@ from api.logic.bark_logic import (
     handle_get_bark,
     handle_update_bark,
 )
-from api.schemas.bark_schemas import (
+from api_v2.schemas.bark_schemas import (
     BarkCreateUpdateSchemaIn,
     BarkSchemaOut,
 )
-from api.logic.exceptions import get_error_response
-from api.schemas.common_schemas import ErrorSchemaOut
+from api_v2.logic.exceptions import get_error_response
+from api_v2.schemas.common_schemas import ErrorSchemaOut
 from common.filters import BarksFilter
 from common.pagination import SkipPagination
 from core.models import BarkModel, DogUserModel
